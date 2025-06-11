@@ -5,86 +5,107 @@
 
 <jsp:include page="../common/header.jsp" />
 
-<h2 class="page-title">Borrowed Books Report</h2>
-
-<form method="GET" action="${pageContext.request.contextPath}/borrowed-items" class="row gx-3 gy-2 align-items-center mb-4">
-    <input type="hidden" name="action" value="list">
-    <div class="col-sm-4">
-        <label class="visually-hidden" for="searchBookTitle">Book Title</label>
-        <input type="text" class="form-control" id="searchBookTitle" name="searchBookTitle" placeholder="Book Title" value="${fn:escapeXml(searchBookTitle)}">
+<div class="card">
+    <div class="card-header">
+        <h1 class="page-title mb-0 fs-5"><i class="bi bi-card-list me-2"></i>Borrowed Books Report</h1>
     </div>
-    <div class="col-sm-4">
-        <label class="visually-hidden" for="searchStudentName">Student Name</label>
-        <input type="text" class="form-control" id="searchStudentName" name="searchStudentName" placeholder="Student Name" value="${fn:escapeXml(searchStudentName)}">
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-info">Search</button>
-    </div>
-</form>
+    <div class="card-body">
+        <div class="search-form-container">
+            <form method="GET" action="${pageContext.request.contextPath}/borrowed-items" class="row g-3 align-items-end">
+                <input type="hidden" name="action" value="list">
+                <div class="col-md-5">
+                    <label for="searchBookTitle" class="form-label small">Book Title:</label>
+                    <input type="text" class="form-control form-control-sm" id="searchBookTitle" name="searchBookTitle" placeholder="Enter book title..." value="${fn:escapeXml(searchBookTitle)}">
+                </div>
+                <div class="col-md-5">
+                    <label for="searchStudentName" class="form-label small">Student Name:</label>
+                    <input type="text" class="form-control form-control-sm" id="searchStudentName" name="searchStudentName" placeholder="Enter student name..." value="${fn:escapeXml(searchStudentName)}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+                </div>
+            </form>
+        </div>
 
-<table class="table table-striped table-bordered table-hover">
-    <thead class="table-dark">
-    <tr>
-        <th>Borrow ID</th>
-        <th>Book Title</th>
-        <th>Author</th>
-        <th>Student Name</th>
-        <th>Class</th>
-        <th>Borrow Date</th>
-        <th>Due Date</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach var="item" items="${borrowedItems}" varStatus="loop">
-        <tr>
-            <td>${fn:escapeXml(item.borrowId)}</td>
-            <td>${fn:escapeXml(item.book.title)}</td>
-            <td>${fn:escapeXml(item.book.author)}</td>
-            <td>${fn:escapeXml(item.student.fullName)}</td>
-            <td>${fn:escapeXml(item.student.className)}</td>
-            <td><fmt:formatDate value="${item.borrowDate}" pattern="dd/MM/yyyy" /></td>
-            <td><fmt:formatDate value="${item.dueDate}" pattern="dd/MM/yyyy" /></td>
-            <td class="action-buttons">
-                <button type="button" class="btn btn-warning btn-sm return-book-btn"
-                        id="returnBtn-${loop.index}"
-                        data-bs-toggle="modal"
-                        data-bs-target="#returnConfirmModal"
-                        data-borrow-id="${fn:escapeXml(item.borrowId)}"
-                        data-book-id="${fn:escapeXml(item.book.bookId)}"
-                        data-student-name="${fn:escapeXml(item.student.fullName)}"
-                        data-book-title="${fn:escapeXml(item.book.title)}">
-                    Return Book
-                </button>
-            </td>
-        </tr>
-    </c:forEach>
-    <c:if test="${empty borrowedItems}">
-        <tr>
-            <td colspan="8" class="text-center">No books are currently borrowed.</td>
-        </tr>
-    </c:if>
-    </tbody>
-</table>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th class="text-center" style="width: 10%;">Borrow ID</th>
+                    <th style="width: 20%;">Book</th>
+                    <th style="width: 18%;">Student</th>
+                    <th class="text-center" style="width: 8%;">Class</th>
+                    <th class="text-center" style="width: 12%;">Borrowed On</th>
+                    <th class="text-center" style="width: 12%;">Return By</th>
+                    <th class="text-center" style="width: 10%;">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach var="item" items="${borrowedItems}" varStatus="loop">
+                    <tr>
+                        <td class="text-center small">${fn:escapeXml(item.borrowId)}</td>
+                        <td>
+                                ${fn:escapeXml(item.book.title)}<br>
+                            <small class="text-muted">By: ${fn:escapeXml(item.book.author)}</small>
+                        </td>
+                        <td>${fn:escapeXml(item.student.fullName)}</td>
+                        <td class="text-center small">${fn:escapeXml(item.student.className)}</td>
+                        <td class="text-center small"><fmt:formatDate value="${item.borrowDate}" pattern="dd MMM, yyyy" /></td>
+                        <td class="text-center small"><fmt:formatDate value="${item.dueDate}" pattern="dd MMM, yyyy" /></td>
+                        <td class="text-center action-buttons">
+                            <button type="button" class="btn btn-outline-warning btn-sm return-book-btn"
+                                    id="returnBtn-${loop.index}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#returnConfirmModal"
+                                    data-borrow-id="${fn:escapeXml(item.borrowId)}"
+                                    data-book-id="${fn:escapeXml(item.book.bookId)}"
+                                    data-student-name="${fn:escapeXml(item.student.fullName)}"
+                                    data-book-title="${fn:escapeXml(item.book.title)}">
+                                <i class="bi bi-arrow-return-left"></i> Return
+                            </button>
+                        </td>
+                    </tr>
+                </c:forEach>
+                <c:if test="${empty borrowedItems}">
+                    <tr>
+                        <td colspan="7" class="text-center fst-italic p-4 text-muted">
+                            No books are currently borrowed <c:if test="${not empty searchBookTitle or not empty searchStudentName}">that match your search criteria</c:if>.
+                        </td>
+                    </tr>
+                </c:if>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-<!-- Return Book Confirmation Modal -->
 <div class="modal fade" id="returnConfirmModal" tabindex="-1" aria-labelledby="returnConfirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="returnConfirmModalLabel">Confirm Book Return</h5>
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-dark" id="returnConfirmModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Book Return
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Student <strong id="modalStudentNameText"></strong> to return book <strong id="modalBookNameText"></strong>?
+                Are you sure student <strong id="modalStudentNameText" class="text-decoration-underline"></strong> will return the book <strong id="modalBookNameText" class="text-decoration-underline"></strong>?
             </div>
             <div class="modal-footer">
-                <form id="returnBookForm" method="POST" action="${pageContext.request.contextPath}/borrowed-items">
+                <form id="returnBookForm" method="POST" action="${pageContext.request.contextPath}/borrowed-items" class="w-100">
                     <input type="hidden" name="action" value="returnBook">
                     <input type="hidden" id="modalFormBorrowId" name="borrowId">
                     <input type="hidden" id="modalFormBookId" name="bookId">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                    <button type="submit" class="btn btn-primary">Return Book</button>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-lg me-1"></i>No, Cancel
+                        </button>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-check-lg me-1"></i>Yes, Return Book
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -94,84 +115,27 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var returnConfirmModalElement = document.getElementById('returnConfirmModal');
-
         if (returnConfirmModalElement) {
-            console.log("DEBUG: Modal element #returnConfirmModal found in the DOM.");
-
             returnConfirmModalElement.addEventListener('show.bs.modal', function (event) {
-                console.log("DEBUG: 'show.bs.modal' event triggered for #returnConfirmModal");
-
                 var button = event.relatedTarget;
-
-                if (!button) {
-                    console.error("DEBUG: event.relatedTarget is NULL or undefined. This is unexpected when modal is triggered by a data-bs-toggle button.");
-                    var activeElement = document.activeElement;
-                    if (activeElement && activeElement.matches('[data-bs-toggle="modal"]')) {
-                        console.log("DEBUG: Fallback: using document.activeElement as button:", activeElement);
-                        button = activeElement;
-                    } else {
-                        console.error("DEBUG: Could not determine the triggering button. Modal data will not be populated.");
-                        return;
-                    }
-                } else {
-                    console.log("DEBUG: Triggering button (event.relatedTarget):", button);
-                    console.log("DEBUG: Button ID:", button.id);
+                if (!button && document.activeElement && document.activeElement.matches('[data-bs-toggle="modal"]')) {
+                    button = document.activeElement;
                 }
-
-                var borrowId = button.getAttribute('data-borrow-id');
-                var bookId = button.getAttribute('data-book-id');
-                var studentName = button.getAttribute('data-student-name');
-                var bookTitle = button.getAttribute('data-book-title');
-
-                console.log("DEBUG: Data from button attributes: borrowId='" + borrowId + "', bookId='" + bookId + "', studentName='" + studentName + "', bookTitle='" + bookTitle + "'");
+                if (!button) {
+                    console.error("DEBUG: Could not determine the triggering button for modal."); return;
+                }
 
                 var modalStudentNameElement = returnConfirmModalElement.querySelector('#modalStudentNameText');
                 var modalBookNameElement = returnConfirmModalElement.querySelector('#modalBookNameText');
                 var modalFormBorrowIdElement = returnConfirmModalElement.querySelector('#modalFormBorrowId');
                 var modalFormBookIdElement = returnConfirmModalElement.querySelector('#modalFormBookId');
 
-                if(modalStudentNameElement) {
-                    modalStudentNameElement.textContent = studentName;
-                    console.log("DEBUG: Successfully set student name in modal: '" + studentName + "'");
-                } else {
-                    console.error("DEBUG: Element #modalStudentNameText NOT found in modal.");
-                }
-
-                if(modalBookNameElement) {
-                    modalBookNameElement.textContent = bookTitle;
-                    console.log("DEBUG: Successfully set book title in modal: '" + bookTitle + "'");
-                } else {
-                    console.error("DEBUG: Element #modalBookNameText NOT found in modal.");
-                }
-
-                if(modalFormBorrowIdElement) {
-                    modalFormBorrowIdElement.value = borrowId;
-                    console.log("DEBUG: Successfully set borrowId in modal form: '" + borrowId + "'");
-                } else {
-                    console.error("DEBUG: Element #modalFormBorrowId (for form input) NOT found in modal.");
-                }
-
-                if(modalFormBookIdElement) {
-                    modalFormBookIdElement.value = bookId;
-                    console.log("DEBUG: Successfully set bookId in modal form: '" + bookId + "'");
-                } else {
-                    console.error("DEBUG: Element #modalFormBookId (for form input) NOT found in modal.");
-                }
+                if(modalStudentNameElement) modalStudentNameElement.textContent = button.getAttribute('data-student-name');
+                if(modalBookNameElement) modalBookNameElement.textContent = button.getAttribute('data-book-title');
+                if(modalFormBorrowIdElement) modalFormBorrowIdElement.value = button.getAttribute('data-borrow-id');
+                if(modalFormBookIdElement) modalFormBookIdElement.value = button.getAttribute('data-book-id');
             });
-
-            console.log("DEBUG: Event listener for 'show.bs.modal' attached to #returnConfirmModal.");
-
-        } else {
-            console.error("DEBUG: Modal element #returnConfirmModal NOT found in the DOM. Cannot attach event listener.");
         }
-
-        var allReturnButtons = document.querySelectorAll('.return-book-btn');
-        console.log("DEBUG: Found " + allReturnButtons.length + " '.return-book-btn' elements.");
-        allReturnButtons.forEach(function(btn, index) {
-            console.log("DEBUG: Button " + index + ": ID=" + btn.id + ", data-bs-target=" + btn.getAttribute('data-bs-target'));
-        });
-
     });
 </script>
-
 <jsp:include page="../common/footer.jsp" />

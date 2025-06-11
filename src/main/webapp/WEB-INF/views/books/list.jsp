@@ -5,86 +5,94 @@
 
 <jsp:include page="../common/header.jsp" />
 
-<h2 class="page-title">Book List</h2>
-
-<div id="dynamicAlertPlaceholder" class="mb-3"></div>
-
-<c:if test="${not empty borrowErrorMsg}">
-    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="serverErrorPopup">
-            ${fn:escapeXml(borrowErrorMsg)}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h1 class="page-title mb-0 fs-5"><i class="bi bi-journals me-2"></i>Book Inventory</h1>
     </div>
-</c:if>
+    <div class="card-body">
+        <div id="dynamicAlertPlaceholder" class="mb-3"></div>
+        <c:if test="${not empty borrowErrorMsg}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="serverErrorPopup">
+                <i class="bi bi-exclamation-triangle-fill"></i>${fn:escapeXml(borrowErrorMsg)}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
 
-<table class="table table-striped table-bordered table-hover">
-    <thead class="table-dark">
-    <tr>
-        <th>Book ID</th>
-        <th>Title</th>
-        <th>Author</th>
-        <th>Quantity</th>
-        <th>Description</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach var="book" items="${books}">
-        <tr>
-            <td>${fn:escapeXml(book.bookId)}</td>
-            <td>${fn:escapeXml(book.title)}</td>
-            <td>${fn:escapeXml(book.author)}</td>
-            <td id="quantity-${fn:escapeXml(book.bookId)}">${book.quantity}</td>
-            <td>${fn:escapeXml(book.description)}</td>
-            <td class="action-buttons">
-                <button type="button" class="btn btn-sm
-                        <c:choose>
-                            <c:when test='${book.quantity > 0}'>btn-success</c:when>
-                            <c:otherwise>btn-secondary</c:otherwise>
-                        </c:choose>"
-                        onclick="handleBorrowClick('${book.bookId}', ${book.quantity})">
-                    Borrow
-                </button>
-            </td>
-        </tr>
-    </c:forEach>
-    <c:if test="${empty books}">
-        <tr>
-            <td colspan="6" class="text-center">No books available in the library.</td>
-        </tr>
-    </c:if>
-    </tbody>
-</table>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered"> <%-- Removed table-striped for cleaner look, added table-bordered --%>
+                <thead>
+                <tr>
+                    <th class="text-center" style="width: 10%;">ID</th>
+                    <th style="width: 25%;">Title</th>
+                    <th style="width: 20%;">Author</th>
+                    <th class="text-center" style="width: 10%;">Quantity</th>
+                    <th style="width: 25%;">Description</th>
+                    <th class="text-center" style="width: 10%;">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach var="book" items="${books}">
+                    <tr>
+                        <td class="text-center small">${fn:escapeXml(book.bookId)}</td>
+                        <td>${fn:escapeXml(book.title)}</td>
+                        <td class="small">${fn:escapeXml(book.author)}</td>
+                        <td class="text-center fw-bold">${book.quantity}</td>
+                        <td class="small">${fn:escapeXml(book.description)}</td>
+                        <td class="text-center action-buttons">
+                            <button type="button" class="btn btn-sm
+                                    <c:choose>
+                                        <c:when test='${book.quantity > 0}'>btn-outline-primary</c:when>
+                                        <c:otherwise>btn-outline-secondary disabled</c:otherwise> <%-- Added disabled for clarity --%>
+                                    </c:choose>"
+                                    onclick="handleBorrowClick('${book.bookId}', ${book.quantity})">
+                                <i class="bi bi-hand-index-thumb"></i> Borrow
+                            </button>
+                        </td>
+                    </tr>
+                </c:forEach>
+                <c:if test="${empty books}">
+                    <tr>
+                        <td colspan="6" class="text-center fst-italic p-4 text-muted">No books available in the library at the moment.</td>
+                    </tr>
+                </c:if>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <script>
     function showAlert(message, type = 'danger') {
         var alertPlaceholder = document.getElementById('dynamicAlertPlaceholder');
+        var iconClass = type === 'warning' ? 'bi-exclamation-triangle-fill' : (type === 'success' ? 'bi-check-circle-fill' : 'bi-info-circle-fill');
         var wrapper = document.createElement('div');
         wrapper.innerHTML = [
-            '<div class="alert alert-' + type + ' alert-dismissible" role="alert">',
-            '   <div>' + message + '</div>',
-            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '<div class="alert alert-' + type + ' alert-dismissible fade show d-flex align-items-center" role="alert">',
+            '   <i class="bi ' + iconClass + ' flex-shrink-0"></i>',
+            '   <div class="ms-2">' + message + '</div>',
+            '   <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>',
             '</div>'
         ].join('');
 
         while (alertPlaceholder.firstChild) {
             alertPlaceholder.removeChild(alertPlaceholder.firstChild);
         }
-        alertPlaceholder.append(wrapper);
+        alertPlaceholder.append(wrapper.firstChild);
 
         setTimeout(function() {
-            var alertInstance = bootstrap.Alert.getInstance(wrapper.firstChild);
-            if (alertInstance) {
-                alertInstance.close();
-            } else if (wrapper.firstChild) {
-                if (wrapper.firstChild.parentNode) {
-                    wrapper.firstChild.parentNode.removeChild(wrapper.firstChild);
+            var alertElement = alertPlaceholder.querySelector('.alert');
+            if(alertElement) {
+                var bsAlert = bootstrap.Alert.getInstance(alertElement);
+                if (bsAlert) {
+                    bsAlert.close();
+                } else if (alertElement.parentNode) {
+                    alertElement.parentNode.removeChild(alertElement);
                 }
             }
-        }, 7000);
+        }, 5000);
     }
 
     function handleBorrowClick(bookId, currentQuantity) {
-        console.log("Borrow clicked for bookId: " + bookId + ", quantity: " + currentQuantity);
         if (currentQuantity > 0) {
             window.location.href = '${pageContext.request.contextPath}/borrow?action=prepare&bookId=' + bookId;
         } else {
@@ -104,8 +112,7 @@
                     if(alertParent) alertParent.removeChild(errorPopupElement);
                 }
             }
-        }, 7000);
+        }, 5000);
     }
 </script>
-
 <jsp:include page="../common/footer.jsp" />
