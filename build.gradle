@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'com.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    javaxServletApiVersion = '4.0.1'
+    javaxJspApiVersion = '2.3.3'
+    jstlVersion = '1.2'
+    mysqlConnectorVersion = '8.0.33'
+}
+
+dependencies {
+    compileOnly "javax.servlet:javax.servlet-api:${javaxServletApiVersion}"
+    compileOnly "javax.servlet.jsp:javax.servlet.jsp-api:${javaxJspApiVersion}"
+    implementation "javax.servlet:jstl:${jstlVersion}"
+
+    implementation "mysql:mysql-connector-java:${mysqlConnectorVersion}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+}
+
+war {
+    archiveFileName = 'library-management.war'
+    destinationDirectory = file("$buildDir/libs")
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+test {
+    useJUnitPlatform()
+}
