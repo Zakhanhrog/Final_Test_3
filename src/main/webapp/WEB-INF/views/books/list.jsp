@@ -19,7 +19,7 @@
         </c:if>
 
         <div class="table-responsive">
-            <table class="table table-hover table-bordered"> <%-- Removed table-striped for cleaner look, added table-bordered --%>
+            <table class="table table-hover table-bordered">
                 <thead>
                 <tr>
                     <th class="text-center" style="width: 10%;">ID</th>
@@ -42,7 +42,7 @@
                             <button type="button" class="btn btn-sm
                                     <c:choose>
                                         <c:when test='${book.quantity > 0}'>btn-outline-primary</c:when>
-                                        <c:otherwise>btn-outline-secondary disabled</c:otherwise> <%-- Added disabled for clarity --%>
+                                        <c:otherwise>btn-outline-secondary</c:otherwise>
                                     </c:choose>"
                                     onclick="handleBorrowClick('${book.bookId}', ${book.quantity})">
                                 <i class="bi bi-hand-index-thumb"></i> Borrow
