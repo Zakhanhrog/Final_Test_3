@@ -108,4 +108,4 @@
         </div>
     </div>
 </nav>
-<div class="container">
+<main class="main-container container py-3 mt-4">
